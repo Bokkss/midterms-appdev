@@ -16,25 +16,30 @@ const registerUser = (req, res) => {
 };
 
 const loginUser = (req, res) => {
-    const { email, password } = req.body;
-
-    // Check if the user exists
-    const user = users.find(user => user.email === email && user.password === password);
+    const user = users.find(u => u.email === req.body.email && u.password === req.body.password);
     if (!user) {
-        return res.status(401).json({ message: 'Invalid credentials' });
+        return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Generate JWT
-    const token = jwt.sign({ id: user.id }, 'secretkey', { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id }, 'secretkey', { expiresIn: '1h' });  // Include user.id in the token
     res.json({ token });
 };
 
 // Get user profile (requires authentication)
 const getUserProfile = (req, res) => {
-    const user = users.find(user => user.id === req.user.id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    console.log('req.user:', req.user);  // Log req.user to check if it's defined
+    
+    if (!req.user) {
+        return res.status(401).json({ message: 'Unauthorized: User not found' });
+    }
 
-    res.json(user);
+    const user = users.find(user => user.id === req.user.id);  // Find user by ID from req.user
+
+    if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(user);  // Return the user's profile
 };
 
 module.exports = {

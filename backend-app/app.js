@@ -12,7 +12,7 @@ app.use('/api/users', userRoutes);  // Use the routes defined in the user file
 
 // Default route to ensure server is running
 app.get('/', (req, res) => {
-    res.send('API works!!');
+    res.send('Working');
 });
 
 // Start the server
