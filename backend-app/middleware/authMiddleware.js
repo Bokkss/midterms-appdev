@@ -1,26 +1,31 @@
 const jwt = require('jsonwebtoken');
 
 const authMiddleware = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    console.log('Authorization header:', authHeader);  // Log the Authorization header for debugging
+    console.log('Request headers:', req.headers);
 
-    // Ensure the token starts with "Bearer "
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        console.log('No token found or incorrect format');
-        return res.status(401).json({ message: 'Access denied, no token provided or wrong format' });
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        console.log('No Authorization header found');
+        return res.status(401).json({ message: 'Access denied, no token provided' });
     }
 
-    const token = authHeader.split(' ')[1];  // Extract the token after "Bearer "
-    console.log('Extracted token:', token);  // Log the token
+    if (!authHeader.startsWith('Bearer ')) {
+        console.log('Authorization header is in the wrong format');
+        return res.status(401).json({ message: 'Invalid token format' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    console.log('Extracted Token:', token);
 
     try {
-        const decoded = jwt.verify(token, 'secretkey');  // Verify the token with your secret key
-        console.log('Decoded token:', decoded);  // Log the decoded token
-        req.user = decoded;  // Attach the decoded user information to req.user
-        next();  // Continue to the next middleware or controller
+        const decoded = jwt.verify(token, 'secretkey');
+        console.log('Decoded Token:', decoded);
+        req.user = decoded;
+        next();
     } catch (error) {
-        console.error('Error decoding token:', error.message);  // Log any error
-        return res.status(400).json({ message: 'Invalid token' });
+        console.error('Token verification failed:', error.message);
+        return res.status(401).json({ message: 'Invalid token' });
     }
 };
 

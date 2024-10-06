@@ -1,3 +1,3 @@
-const users = [];  // This is an array that will hold our users
+const users = [];
 
 module.exports = users;
