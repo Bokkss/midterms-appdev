@@ -15,13 +15,14 @@ const registerUser = (req, res) => {
     res.status(201).json({ message: 'User registered successfully' });
 };
 
-// Login user
 const loginUser = (req, res) => {
     const { email, password } = req.body;
 
-    // Validate user credentials
+    // Check if the user exists
     const user = users.find(user => user.email === email && user.password === password);
-    if (!user) return res.status(401).json({ message: 'Invalid credentials' });
+    if (!user) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+    }
 
     // Generate JWT
     const token = jwt.sign({ id: user.id }, 'secretkey', { expiresIn: '1h' });
